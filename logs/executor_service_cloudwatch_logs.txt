@@ -1,0 +1,40 @@
+.   ____          _            __ _ _
+/\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+\\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+'  |____| .__|_| |_|_| |_\__, | / / / /
+=========|_|==============|___/=/_/_/_/
+:: Spring Boot ::        (v2.2.0.RELEASE)
+2019-11-25 10:19:51.433  INFO 1 --- [           main] edu.sjsu.codepad.JavaExecutorService     : Starting JavaExecutorService v0.0.1-SNAPSHOT on ip-10-0-34-76.ec2.internal with PID 1 (/app.jar started by root in /)
+2019-11-25 10:19:51.526  INFO 1 --- [           main] edu.sjsu.codepad.JavaExecutorService     : No active profile set, falling back to default profiles: default
+2019-11-25 10:20:02.130  INFO 1 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 5000 (http)
+2019-11-25 10:20:02.230  INFO 1 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2019-11-25 10:20:02.230  INFO 1 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.27]
+2019-11-25 10:20:02.934  INFO 1 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2019-11-25 10:20:02.935  INFO 1 --- [           main] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 10704 ms
+2019-11-25 10:20:04.633  INFO 1 --- [           main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2019-11-25 10:20:05.325  INFO 1 --- [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
+2019-11-25 10:20:06.434  INFO 1 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 5000 (http) with context path ''
+2019-11-25 10:20:06.527  INFO 1 --- [           main] edu.sjsu.codepad.JavaExecutorService     : Started JavaExecutorService in 21.995 seconds (JVM running for 26.014)
+2019-11-25 10:33:19.929  INFO 1 --- [nio-5000-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2019-11-25 10:33:19.930  INFO 1 --- [nio-5000-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2019-11-25 10:33:20.024  INFO 1 --- [nio-5000-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 94 ms
+edu.sjsu.codepad.models.CodeMetadata@32b4c5ad
+Loading class `com.mysql.jdbc.Driver'. This is deprecated. The new driver class is `com.mysql.cj.jdbc.Driver'. The driver is automatically registered via the SPI and manual loading of the driver class is generally unnecessary.
+python Solution.py stdout: Hello after 5 seconds
+python Solution.py exitValue() 0
+**********
+edu.sjsu.codepad.models.CodeMetadata@66b7f6e0
+javac Solution.java stderr: Solution.java:1: error: '.' expected
+javac Solution.java stderr: import time
+javac Solution.java stderr:            ^
+javac Solution.java stderr: Solution.java:2: error: ';' expected
+javac Solution.java stderr: time.sleep(1)
+javac Solution.java stderr:           ^
+javac Solution.java stderr: 2 errors
+javac Solution.java exitValue() 1
+**********
+edu.sjsu.codepad.models.CodeMetadata@5c28e611
+python Solution.py stdout: Hello after 30 seconds
+python Solution.py exitValue() 0
+**********

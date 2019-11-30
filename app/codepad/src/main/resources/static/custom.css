@@ -1,0 +1,19 @@
+body {
+    background-color: white;  
+	.bs-example{
+    	margin: 20px;
+	}
+}
+
+#heading {
+    text-align: center; 
+}
+
+.ipinfo, #choiceText {
+  text-align: center;
+  font-size: 150%;
+}
+
+#output, #outputLabel, #codeText {
+  font-size: large;
+}

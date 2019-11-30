@@ -1,0 +1,23 @@
+.   ____          _            __ _ _
+/\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+\\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+'  |____| .__|_| |_|_| |_\__, | / / / /
+=========|_|==============|___/=/_/_/_/
+:: Spring Boot ::        (v2.2.0.RELEASE)
+2019-11-25 10:19:24.318  INFO 1 --- [           main] edu.sjsu.codepad.JavaExecutorService     : Starting JavaExecutorService v0.0.1-SNAPSHOT on ip-10-0-37-230.ec2.internal with PID 1 (/app.jar started by root in /)
+2019-11-25 10:19:24.322  INFO 1 --- [           main] edu.sjsu.codepad.JavaExecutorService     : No active profile set, falling back to default profiles: default
+2019-11-25 10:19:35.324  INFO 1 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port(s): 5000 (http)
+2019-11-25 10:19:35.423  INFO 1 --- [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2019-11-25 10:19:35.423  INFO 1 --- [           main] org.apache.catalina.core.StandardEngine  : Starting Servlet engine: [Apache Tomcat/9.0.27]
+2019-11-25 10:19:36.022  INFO 1 --- [           main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2019-11-25 10:19:36.022  INFO 1 --- [           main] o.s.web.context.ContextLoader            : Root WebApplicationContext: initialization completed in 10901 ms
+2019-11-25 10:19:37.729  INFO 1 --- [           main] o.s.s.concurrent.ThreadPoolTaskExecutor  : Initializing ExecutorService 'applicationTaskExecutor'
+2019-11-25 10:19:38.619  INFO 1 --- [           main] o.s.b.a.w.s.WelcomePageHandlerMapping    : Adding welcome page template: index
+2019-11-25 10:19:39.728  INFO 1 --- [           main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port(s): 5000 (http) with context path ''
+2019-11-25 10:19:39.732  INFO 1 --- [           main] edu.sjsu.codepad.JavaExecutorService     : Started JavaExecutorService in 22.711 seconds (JVM running for 26.919)
+2019-11-25 10:19:57.434  INFO 1 --- [nio-5000-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2019-11-25 10:19:57.517  INFO 1 --- [nio-5000-exec-2] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2019-11-25 10:19:57.524  INFO 1 --- [nio-5000-exec-2] o.s.web.servlet.DispatcherServlet        : Completed initialization in 7 ms
+2019-11-25 10:28:44.630  WARN 1 --- [nio-5000-exec-8] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.HttpRequestMethodNotSupportedException: Request method 'GET' not supported]
+Loading class `com.mysql.jdbc.Driver'. This is deprecated. The new driver class is `com.mysql.cj.jdbc.Driver'. The driver is automatically registered via the SPI and manual loading of the driver class is generally unnecessary.

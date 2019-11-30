@@ -1,0 +1,187 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Services and Tasks
+
+Resources:
+
+  PrivateNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Name: codepad.com
+      Vpc: !ImportValue 'VPC'
+
+  GatewayDiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Description: Discovery Service for the microservice containers
+      DnsConfig:
+        RoutingPolicy: MULTIVALUE
+        DnsRecords:
+          - TTL: 60
+            Type: A
+          - TTL: 60
+            Type: SRV
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+      Name: GatewayService
+      NamespaceId: !Ref PrivateNamespace
+
+  ExecutorDiscoveryService:
+    Type: AWS::ServiceDiscovery::Service
+    Properties:
+      Description: Discovery Service for the microservice containers
+      DnsConfig:
+        RoutingPolicy: MULTIVALUE
+        DnsRecords:
+          - TTL: 60
+            Type: A
+          - TTL: 60
+            Type: SRV
+      HealthCheckCustomConfig:
+        FailureThreshold: 1
+      Name: ExecutorService
+      NamespaceId: !Ref PrivateNamespace
+
+  GatewayTask:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: codepad
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !ImportValue ECSTaskExecutionRole
+      RequiresCompatibilities:
+        - FARGATE
+      ContainerDefinitions:
+        - Name: api-gateway
+          Image: 095745423178.dkr.ecr.us-east-1.amazonaws.com/cloud-project:v7
+          Environment:
+            - Name: EXECUTOR_SERVICE_URL
+              Value: 'executorservice.codepad.com:5000'
+            - Name: DB_DOMAIN
+              Value: !ImportValue 'CloudProjectDbDns'
+          PortMappings:
+            - ContainerPort: 5000
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: codepad_logs
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: 'api-gateway'
+
+  GatewayService:
+    Type: AWS::ECS::Service
+    DependsOn: GatewayListenerRule
+    Properties:
+      TaskDefinition: !Ref GatewayTask
+      Cluster: !ImportValue 'ECSCluster'
+      LaunchType: FARGATE
+      DesiredCount: 2
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 70
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !ImportValue Subnet1
+            - !ImportValue Subnet2
+          SecurityGroups:
+            - !ImportValue ContainerSecurityGroup
+      LoadBalancers:
+        - ContainerName: api-gateway
+          ContainerPort: 5000
+          TargetGroupArn: !Ref GatewayTargetGroup
+      ServiceName: gatewayservice
+      ServiceRegistries:
+        - RegistryArn: !GetAtt GatewayDiscoveryService.Arn
+          Port: 80
+
+  ExecutorTask:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: codepad
+      Cpu: 256
+      Memory: 512
+      NetworkMode: awsvpc
+      ExecutionRoleArn: !ImportValue ECSTaskExecutionRole
+      RequiresCompatibilities:
+        - FARGATE
+      ContainerDefinitions:
+        - Name: executor
+          Image: 095745423178.dkr.ecr.us-east-1.amazonaws.com/cloud-project:v7
+          Environment:
+            - Name: DB_DOMAIN
+              Value: !ImportValue 'CloudProjectDbDns'
+          PortMappings:
+            - ContainerPort: 5000
+              Protocol: tcp
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: codepad_logs
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: 'executor'
+
+  ExecutorService:
+    Type: AWS::ECS::Service
+    Properties:
+      TaskDefinition: !Ref ExecutorTask
+      Cluster: !ImportValue 'ECSCluster'
+      LaunchType: FARGATE
+      DesiredCount: 2
+      DeploymentConfiguration:
+        MaximumPercent: 200
+        MinimumHealthyPercent: 70
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          Subnets:
+            - !ImportValue Subnet1
+            - !ImportValue Subnet2
+          SecurityGroups:
+            - !ImportValue InternalAccessSecurityGroup
+      ServiceName: executorservice
+      ServiceRegistries:
+        - RegistryArn: !GetAtt ExecutorDiscoveryService.Arn
+          Port: 80
+
+
+  GatewayTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: apigateway-tg
+      VpcId: !ImportValue 'VPC'
+      Protocol: HTTP
+      Port: 80
+      Matcher:
+        HttpCode: 200-209
+      HealthCheckIntervalSeconds: 10
+      HealthCheckPath: /
+      HealthCheckProtocol: HTTP
+      HealthCheckTimeoutSeconds: 5
+      HealthyThresholdCount: 10
+      TargetType: ip
+
+
+  GatewayListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !ImportValue HTTPListener
+      Priority: 2
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /
+            - /submitcode
+      Actions:
+        - TargetGroupArn: !Ref GatewayTargetGroup
+          Type: forward
+
+Outputs:
+
+  ServerEndPoint:
+    Description: HTTP server endpoint
+    Value: !Join ['', ['http://', !ImportValue LoadBalancerDomainName, '/']]
+    Export:
+      Name: HTTP-server-endpoint

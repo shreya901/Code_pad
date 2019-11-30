@@ -1,0 +1,133 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Container cluster and load balancer
+
+Resources:
+
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: 'codepad_containers'
+
+  LoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: 'codepad-service'
+      Subnets:
+        - !ImportValue 'Subnet1'
+        - !ImportValue 'Subnet2'
+      SecurityGroups:
+        - !Ref LoadBalancerSecurityGroup
+
+  LoadBalancerListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Protocol: HTTP
+      Port: 80
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref DefaultTargetGroup
+
+  LoadBalancerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for loadbalancer to services on ECS
+      VpcId: !ImportValue 'VPC'
+      SecurityGroupIngress:
+        - CidrIp: 0.0.0.0/0
+          IpProtocol: -1
+
+  DefaultTargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: default
+      VpcId: !ImportValue 'VPC'
+      Protocol: HTTP
+      Port: 80
+
+  CloudWatchLogsGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: 'codepad_logs'
+      RetentionInDays: 1
+
+  ContainerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for containers
+      VpcId: !ImportValue 'VPC'
+      SecurityGroupIngress:
+        - SourceSecurityGroupId: !Ref 'LoadBalancerSecurityGroup'
+          IpProtocol: -1
+
+  InternalAccessSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for internal access
+      VpcId: !ImportValue 'VPC'
+      SecurityGroupIngress:
+        - CidrIp: 10.0.0.0/16
+          IpProtocol: -1
+
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Subnet Groups for DB
+      SubnetIds:
+        - !ImportValue 'Subnet1'
+        - !ImportValue 'Subnet2'
+
+  CloudProjectDb:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: 'cloudprojectdb'
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      AllocatedStorage: '5'
+      StorageType: gp2
+      DBInstanceClass: db.t2.micro
+      Engine: MySQL
+      EngineVersion: 5.7.26
+      MasterUsername: admin
+      MasterUserPassword: password
+      DBName: 'codedb'
+      PubliclyAccessible: true
+      VPCSecurityGroups:
+        - !Ref InternalAccessSecurityGroup
+        - !Ref LoadBalancerSecurityGroup
+    DeletionPolicy: Snapshot
+
+Outputs:
+  Cluster:
+    Value: !Ref ECSCluster
+    Export:
+      Name: 'ECSCluster'
+
+  Listener:
+    Description: HTTP load balancer listener
+    Value: !Ref LoadBalancerListener
+    Export:
+      Name: 'HTTPListener'
+
+  ContainerSecurityGroup:
+    Description: Container security group
+    Value: !Ref ContainerSecurityGroup
+    Export:
+      Name: 'ContainerSecurityGroup'
+
+  LoadBalancerDns:
+    Description: Domain name for LoadBalancer
+    Value: !GetAtt LoadBalancer.DNSName
+    Export:
+      Name: 'LoadBalancerDomainName'
+
+  InternalAccessSecurityGroup:
+    Description: Security Group for Internal Access
+    Value: !Ref InternalAccessSecurityGroup
+    Export:
+      Name: 'InternalAccessSecurityGroup'
+
+  CloudProjectDbDns:
+    Description: Domain name for CloudProjectDB
+    Value: !GetAtt CloudProjectDb.Endpoint.Address
+    Export:
+      Name: 'CloudProjectDbDns'
